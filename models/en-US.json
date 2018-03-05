@@ -1,0 +1,52 @@
+{
+  "interactionModel": {
+    "languageModel": {
+        "invocationName": "cardoc",
+        "intents": [
+            {
+                "name": "AMAZON.CancelIntent",
+                "slots": [],
+                "samples": []
+            },
+            {
+                "name": "AMAZON.HelpIntent",
+                "slots": [],
+                "samples": []
+            },
+            {
+                "name": "AMAZON.StopIntent",
+                "slots": [],
+                "samples": []
+            },
+            {
+                "name": "CheckStatusIntent",
+                "slots": [],
+                "samples": [
+                    "how is my car",
+                    "if everything is alright",
+                    "Is everything alright"
+                ]
+            },
+            {
+                "name": "AnalyzeSoundIntent",
+                "slots": [],
+                "samples": [
+                    "to analyze the noises in my car",
+                    "noise analysis"
+                ]
+            },
+            {
+                "name": "AMAZON.NoIntent",
+                "slots": [],
+                "samples": []
+            },
+            {
+                "name": "AMAZON.YesIntent",
+                "slots": [],
+                "samples": []
+            }
+        ],
+        "types": []
+    }
+  }
+}

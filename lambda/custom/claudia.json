@@ -1,0 +1,7 @@
+{
+  "lambda": {
+    "role": "cardoc-skill-executor",
+    "name": "cardoc-skill",
+    "region": "eu-west-1"
+  }
+}

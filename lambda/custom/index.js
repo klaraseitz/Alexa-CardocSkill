@@ -35,12 +35,13 @@ const states = {
 //=========================================================================================================================================
 const conditionData = [
     'You are low on oil.',
-    'Your brakes are worn off.'
+    'Your brakes are worn off.',
+		'There are no issues with your car.'
 ];
 
 const requestForSilence = [
     'Silence please. I will analyze in ',
-    'To get the best result please turn of your radio. I will start the recording in ',
+    'To get the best result please turn off your radio. I will start the recording in ',
     'I am starting sound recording in '
 ];
 
@@ -53,7 +54,7 @@ const noiseData = [
 const problem = 'the water pump.'
 
 //=========================================================================================================================================
-//Editing anything below this line might break your skill.
+// Intents of the skill with their handlers
 //=========================================================================================================================================
 
 exports.handler = function(event, context, callback) {

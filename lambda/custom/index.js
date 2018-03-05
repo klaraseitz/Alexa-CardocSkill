@@ -59,7 +59,7 @@ const problem = 'the water pump.'
 exports.handler = function(event, context, callback) {
     var alexa = Alexa.handler(event, context);
     alexa.appId = APP_ID;
-    alexa.registerHandlers(handlers);
+    alexa.registerHandlers(handlers, appointmentModeHandlers);
     alexa.execute();
 };
 
@@ -70,8 +70,8 @@ const handlers = {
     },
     'CheckStatusIntent': function () {
         const conditionIndex = Math.floor(Math.random() * conditionData.length);
-
-        this.response.speak(conditionData[conditionsIndex]);
+				this.response.speak(conditionData[conditionIndex]);
+				
         this.emit(':responseReady');
     },
     'AnalyzeSoundIntent': function () {
@@ -82,10 +82,11 @@ const handlers = {
       speechOutput += ' You should have this checked at your car workshop.';
 
       var question = ' Do you want me to send you a push notification with suggestions for an appointment?';
-      // this.response.speak(speechOutput+' Do you want me to send you a push notification with suggestions for an appointment?')
-      //              .listen("Repeat please.");
-      this.emit(':ask', speechOutput + question, 'Repeat please');
-      // this.emit(':responseReady');
+			this.handler.state = "_APPOINTMENTMODE";
+      this.response.speak(speechOutput+' Do you want me to send you a push notification with suggestions for an appointment?')
+                   .listen("Repeat please.");
+      // this.emit(':ask', speechOutput + question, 'Repeat please');
+      this.emit(':responseReady');
     },
     'AMAZON.HelpIntent': function () {
         const speechOutput = HELP_MESSAGE;
@@ -101,13 +102,16 @@ const handlers = {
     'AMAZON.StopIntent': function () {
         this.response.speak(STOP_MESSAGE);
         this.emit(':responseReady');
-    },
-    'AMAZON.YesIntent': function () {
-        this.response.speak('ok, then yes');
-        this.emit(':responseReady');
-    },
-    'AMAZON.NoIntent': function () {
-        this.response.speak('ok, then no');
-        this.emit(':responseReady');
-    },
+    }
 };
+
+const appointmentModeHandlers = Alexa.CreateStateHandler("_APPOINTMENTMODE"	, {
+		'AMAZON.YesIntent': function () {
+				this.response.speak('Ok, I sent you some appointment suggestions to your phone.');
+				this.emit(':responseReady');
+		},
+		'AMAZON.NoIntent': function () {
+				this.response.speak('Ok, I won\'t send you appointment suggestions.');
+				this.emit(':responseReady');
+		}
+});

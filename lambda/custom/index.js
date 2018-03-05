@@ -59,19 +59,21 @@ const problem = 'the water pump.'
 exports.handler = function(event, context, callback) {
     var alexa = Alexa.handler(event, context);
     alexa.appId = APP_ID;
-    alexa.registerHandlers(handlers, appointmentModeHandlers);
+    alexa.registerHandlers(handlers, appointmentModeHandlers, analysisModeHandlers);
     alexa.execute();
 };
 
 const handlers = {
-    'LaunchRequest': function () { // User says "start carDoc"
+    'LaunchRequest': function () {
         this.response.speak(HELLO_MESSAGE+HELP_MESSAGE);
         this.emit(':responseReady');
     },
     'CheckStatusIntent': function () {
         const conditionIndex = Math.floor(Math.random() * conditionData.length);
-				this.response.speak(conditionData[conditionIndex]);
-				
+				this.handler.state = "_ANALYSISMODE";
+				this.response.speak(conditionData[conditionIndex] + " Do you want me to analyze the sound of your car also?")
+										 .listen("Say yes to start the noise analysis.");
+
         this.emit(':responseReady');
     },
     'AnalyzeSoundIntent': function () {
@@ -112,6 +114,18 @@ const appointmentModeHandlers = Alexa.CreateStateHandler("_APPOINTMENTMODE"	, {
 		},
 		'AMAZON.NoIntent': function () {
 				this.response.speak('Ok, I won\'t send you appointment suggestions.');
+				this.emit(':responseReady');
+		}
+});
+
+const analysisModeHandlers = Alexa.CreateStateHandler("_ANALYSISMODE"	, {
+		'AMAZON.YesIntent': function () {
+				// this.response.speak('Ok, I will start recording');
+				this.handler.state = "";
+				this.emit('AnalyzeSoundIntent');
+		},
+		'AMAZON.NoIntent': function () {
+				this.response.speak('Ok, then we\'re done.');
 				this.emit(':responseReady');
 		}
 });

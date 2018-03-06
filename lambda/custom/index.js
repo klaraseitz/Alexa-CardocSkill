@@ -60,36 +60,53 @@ const problem = 'the water pump.'
 exports.handler = function(event, context, callback) {
     var alexa = Alexa.handler(event, context);
     alexa.appId = APP_ID;
-    alexa.registerHandlers(handlers, appointmentModeHandlers, analysisModeHandlers);
+    alexa.registerHandlers(sessionHandlers, defaultHandlers, appointmentModeHandlers, analysisModeHandlers);
     alexa.execute();
 };
 
-const handlers = {
-    'LaunchRequest': function () {
-        this.response.speak(HELLO_MESSAGE+HELP_MESSAGE);
+const sessionHandlers = {
+		'LaunchRequest': function () {
+				this.handler.state = '_DEFAULTMODE';
+        this.response.speak('Hi, I am Cardoc. What can I help you with?')
+										 .listen('Ask me to check the status or analyse noise.');
         this.emit(':responseReady');
     },
+		'CheckStatusIntent': function () {
+				this.handler.state = "_DEFAULTMODE";
+				this.emitWithState('CheckStatusIntent');
+		},
+		'AnalyzeSoundIntent': function () {
+				this.handler.state = "_DEFAULTMODE";
+				this.emitWithState('AnalyzeSoundIntent');
+		},
+		'AMAZON.HelpIntent': function () {
+				this.handler.state = "_DEFAULTMODE";
+				this.emitWithState('AMAZON.HelpIntent');
+		}
+}
+
+const defaultHandlers = Alexa.CreateStateHandler("_DEFAULTMODE"	, {
     'CheckStatusIntent': function () {
-        const conditionIndex = Math.floor(Math.random() * conditionData.length);
+	      const conditionIndex = Math.floor(Math.random() * conditionData.length);
 				this.handler.state = "_ANALYSISMODE";
 				this.response.speak(conditionData[conditionIndex] + " Do you want me to analyze the sound of your car also?")
 										 .listen("Say yes to start the noise analysis.");
 
-        this.emit(':responseReady');
+	      this.emit(':responseReady');
     },
     'AnalyzeSoundIntent': function () {
-      const silenceIndex = Math.floor(Math.random() * requestForSilence.length);
-      const noiseIndex = Math.floor(Math.random() * noiseData.length);
-      var speechOutput = requestForSilence[silenceIndex] + '3... 2... 1 <break time="5s" /> Done.';
-      speechOutput += ' ' + noiseData[noiseIndex] + problem;
-      speechOutput += ' You should have this checked at your car workshop.';
+	      const silenceIndex = Math.floor(Math.random() * requestForSilence.length);
+	      const noiseIndex = Math.floor(Math.random() * noiseData.length);
+	      var speechOutput = requestForSilence[silenceIndex] + '3... 2... 1 <break time="5s" /> Done.';
+	      speechOutput += ' ' + noiseData[noiseIndex] + problem;
+	      speechOutput += ' You should have this checked at your car workshop.';
 
-      var question = ' Do you want me to send you a push notification with suggestions for an appointment?';
-			this.handler.state = "_APPOINTMENTMODE";
-      this.response.speak(speechOutput+' Do you want me to send you a push notification with suggestions for an appointment?')
-                   .listen("Repeat please.");
-      // this.emit(':ask', speechOutput + question, 'Repeat please');
-      this.emit(':responseReady');
+	      var question = ' Do you want me to send you a push notification with suggestions for an appointment?';
+				this.handler.state = "_APPOINTMENTMODE";
+	      this.response.speak(speechOutput+' Do you want me to send you a push notification with suggestions for an appointment?')
+	                   .listen("Repeat please.");
+	      // this.emit(':ask', speechOutput + question, 'Repeat please');
+	      this.emit(':responseReady');
     },
     'AMAZON.HelpIntent': function () {
         const speechOutput = HELP_MESSAGE;
@@ -105,12 +122,20 @@ const handlers = {
     'AMAZON.StopIntent': function () {
         this.response.speak(STOP_MESSAGE);
         this.emit(':responseReady');
-    }
-};
+    },
+		'AMAZON.YesIntent': function () {
+				this.response.speak('Sorry, this was not a yes or no question.');
+				this.emit(':responseReady');
+		},
+		'AMAZON.NoIntent': function () {
+				this.response.speak('Sorry, this was not a yes or no question.');
+				this.emit(':responseReady');
+		}
+});
 
 const appointmentModeHandlers = Alexa.CreateStateHandler("_APPOINTMENTMODE"	, {
 		'AMAZON.YesIntent': function () {
-				this.response.speak('Ok, I sent you some appointment suggestions to your phone.');
+				this.response.speak('Ok, I sent you some suggestions for an appointment to your phone.');
 				this.emit(':responseReady');
 		},
 		'AMAZON.NoIntent': function () {
@@ -121,12 +146,11 @@ const appointmentModeHandlers = Alexa.CreateStateHandler("_APPOINTMENTMODE"	, {
 
 const analysisModeHandlers = Alexa.CreateStateHandler("_ANALYSISMODE"	, {
 		'AMAZON.YesIntent': function () {
-				// this.response.speak('Ok, I will start recording');
-				this.handler.state = "";
-				this.emit('AnalyzeSoundIntent');
+				this.handler.state = "_DEFAULTMODE";
+				this.emitWithState("AnalyzeSoundIntent");
 		},
 		'AMAZON.NoIntent': function () {
-				this.response.speak('Ok, then we\'re done.');
+				this.response.speak('Ok.');
 				this.emit(':responseReady');
 		}
 });
